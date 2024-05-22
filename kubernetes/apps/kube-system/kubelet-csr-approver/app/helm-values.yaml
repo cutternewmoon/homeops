@@ -1,0 +1,3 @@
+---
+providerRegex: ^(mikeflix-1|mikeflix-2|mikeflix-3)$
+bypassDnsResolution: true
