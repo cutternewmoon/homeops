@@ -4,13 +4,18 @@ kind: Kustomization
 resources:
   - ./bjw-s.yaml
   - ./cilium.yaml
+  - ./cloudnative-pg.yaml
   - ./csi-driver-nfs.yaml
   - ./coredns.yaml
+  - ./external-secrets/ks.yaml
+  - ./intel.yaml
   - ./jetstack.yaml
   - ./metrics-server.yaml
+  - ./node-feature-discovery.yaml
   - ./openebs.yaml
   - ./postfinance.yaml
   - ./prometheus-community.yaml
+  - ./servicenow-charts.yaml
   - ./spegel.yaml
   - ./stakater.yaml
   - ./external-dns.yaml

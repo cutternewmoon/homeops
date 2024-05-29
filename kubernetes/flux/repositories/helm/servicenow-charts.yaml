@@ -1,0 +1,9 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: servicenow-charts
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://install.service-now.com/glide/distribution/builds/package/informer/informer-helm/repo
