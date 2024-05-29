@@ -7,7 +7,7 @@ resources:
   - ./cloudnative-pg.yaml
   - ./csi-driver-nfs.yaml
   - ./coredns.yaml
-  - ./external-secrets/ks.yaml
+  - ./external-secrets.yaml
   - ./intel.yaml
   - ./jetstack.yaml
   - ./metrics-server.yaml
