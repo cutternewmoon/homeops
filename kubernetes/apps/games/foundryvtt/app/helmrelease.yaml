@@ -81,7 +81,7 @@ spec:
                 pathType: Prefix
                 service:
                   name: main
-                  port: http
+                  port: 80
         tls:
           - hosts:
               - *host
@@ -92,6 +92,7 @@ spec:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         storageClass: k8s-config
+        size: 10gb
         retain: true
         globalMounts:
           - path: /data
