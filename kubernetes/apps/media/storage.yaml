@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: glabmediapv
+  namespace: media
+spec:
+  capacity:
+    storage: 10Ti
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  mountOptions:
+    - nfsvers=4.1
+  nfs:
+    path: /volume1/MikeFlixStorage
+    server: 192.168.30.180
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: glabmediaclass
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: glabmediaclaim
+  namespace: media
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Ti
+  storageClassName: glabmediaclass
