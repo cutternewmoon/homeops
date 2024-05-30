@@ -92,7 +92,7 @@ spec:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         storageClass: k8s-config
-        size: 10gb
+        size: 50Gi
         retain: true
         globalMounts:
           - path: /data
