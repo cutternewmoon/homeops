@@ -1,0 +1,122 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: plex
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 3.2.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  dependsOn:
+    - name: intel-device-plugin-gpu
+      namespace: kube-system
+  values:
+    controllers:
+      plex:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/plex
+              tag: rolling
+            env:
+              PLEX_PREFERENCE_1: "allowedNetworks=192.168.1.1/24"
+              PLEX_ADVERTISE_URL: "https://plex.cutternewmoon.com:443,http://192.168.1.155:32400"
+            resources:
+              requests:
+                gpu.intel.com/i915: 1
+                cpu: 100m
+                memory: 8G
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 12G
+              probes:
+                liveness: &probes
+                  enabled: true
+                  custom: true
+                  spec:
+                    httpGet:
+                      path: /identity
+                      port: 32400
+                    initialDelaySeconds: 0
+                    periodSeconds: 10
+                    timeoutSeconds: 1
+                    failureThreshold: 3
+                readiness: *probes
+                startup:
+                  enabled: true
+                  spec:
+                    failureThreshold: 30
+                    periodSeconds: 10
+    defaultPodOptions:
+      enableServiceLinks: false
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: "OnRootMismatch"
+        supplementalGroups:
+          - 44
+          - 105
+          - 109
+          - 65539
+      nodeSelector:
+        intel.feature.node.kubernetes.io/gpu: "true"
+    service:
+      app:
+        controller: plex
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: 192.168.1.155
+        ports:
+          http:
+            port: 32400
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+        className: external
+        hosts:
+          - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  name: main
+                  port: 32400
+        tls:
+          - hosts:
+              - *host
+
+    persistence:
+      config:
+        enabled: true
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        storageClass: k8s-config
+        size: 50Gi
+        retain: true
+        globalMounts:
+          - path: /config
+      media:
+        type: persistentVolumeClaim
+        existingClaim: glabmediaclaim
+        globalMounts:
+          - path: /media
+      transcode:
+        type: emptyDir
+        globalMounts:
+          - path: /transcode
