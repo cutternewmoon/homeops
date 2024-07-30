@@ -66,6 +66,9 @@ spec:
     service:
       app:
         controller: foundryvtt
+        type: LoadBalancer
+        annotations:
+          io.cilium/lb-ipam-ips: 192.168.1.140
         ports:
           http:
             port: 30000
@@ -83,7 +86,7 @@ spec:
                 pathType: Prefix
                 service:
                   name: main
-                  port: 30000
+                  port: 80
         tls:
           - hosts:
               - *host
