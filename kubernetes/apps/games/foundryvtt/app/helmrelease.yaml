@@ -85,7 +85,7 @@ spec:
               - path: /
                 pathType: Prefix
                 service:
-                  name: app
+                  name: *app
                   port: 80
         tls:
           - hosts:
