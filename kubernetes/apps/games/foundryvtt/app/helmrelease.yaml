@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: foundryvtt
+  name: &app foundryvtt
   namespace: games
 spec:
   interval: 15m
@@ -35,12 +35,12 @@ spec:
         seccompProfile: { type: RuntimeDefault }
 
     controllers:
-      foundryvtt:
+      *app :
         annotations:
           reloader.stakater.com/auto: 'true'
 
         containers:
-          app:
+          *app :
             image:
               repository: ghcr.io/felddy/foundryvtt
               tag: 12.331.0
@@ -65,7 +65,7 @@ spec:
 
     service:
       app:
-        controller: foundryvtt
+        controller: *app
         type: LoadBalancer
         annotations:
           io.cilium/lb-ipam-ips: 192.168.1.140
@@ -74,7 +74,7 @@ spec:
             port: 30000
 
     ingress:
-      app:
+      *app :
         enabled: true
         className: external
         annotations:
@@ -85,7 +85,7 @@ spec:
               - path: /
                 pathType: Prefix
                 service:
-                  name: main
+                  name: app
                   port: http
         tls:
           - hosts:
