@@ -74,7 +74,7 @@ spec:
             port: 30000
 
     ingress:
-      main:
+      app:
         enabled: true
         className: external
         annotations:
@@ -86,7 +86,7 @@ spec:
                 pathType: Prefix
                 service:
                   name: main
-                  port: 30000
+                  port: http
         tls:
           - hosts:
               - *host
