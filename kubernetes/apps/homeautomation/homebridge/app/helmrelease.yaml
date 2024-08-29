@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: homebridge
+  name: &app homebridge
   namespace: homeautomation
 spec:
   chart:
@@ -29,12 +29,12 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
     controllers:
-      main:
+      *app :
         strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          *app :
             image:
               repository: homebridge/homebridge
               tag: "latest"
@@ -62,14 +62,15 @@ spec:
               limits:
                 memory: 750Mi
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: *port
     ingress:
-      main:
+      *app :
         enabled: true
-        ingressClassName: nginx
+        className: internal
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
@@ -77,11 +78,10 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
-                  port: http
+                  name: *app
+                  port: 80
         tls:
-          - secretName: homebridge-tls
-            hosts:
+          - hosts:
               - *host
     configMaps:
       config:
@@ -111,4 +111,3 @@ spec:
         globalMounts:
           - path: /homebridge/startup.sh
             subPath: startup.sh
-            defaultMode: 493
