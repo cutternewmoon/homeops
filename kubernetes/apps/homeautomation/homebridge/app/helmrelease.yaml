@@ -95,7 +95,7 @@ spec:
             npm install --save homebridge-ring@latest
 
     persistence:
-      homebridge:
+      homebridge-homebridge:
         enabled: true
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
