@@ -15,6 +15,9 @@ spec:
         namespace: flux-system
   maxHistory: 3
   interval: 30m
+  dependsOn:
+    - name: intel-device-plugin-gpu
+      namespace: kube-system
   install:
     remediation:
       retries: 3
@@ -57,9 +60,11 @@ spec:
                 enabled: false
             resources:
               requests:
+                gpu.intel.com/i915: 1
                 cpu: 10m
                 memory: 100Mi
               limits:
+                gpu.intel.com/i915: 1
                 memory: 750Mi
     service:
       app:
