@@ -103,7 +103,7 @@ spec:
         size: 3Gi
         retain: true
         globalMounts:
-          - path: /config
+          - path: /var/lib/homebridge
       startup-sh:
         enabled: true
         type: configMap
