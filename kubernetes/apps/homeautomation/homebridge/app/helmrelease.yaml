@@ -79,7 +79,7 @@ spec:
               - path: /
                 service:
                   name: *app
-                  port: 80
+                  port: *port
         tls:
           - hosts:
               - *host
