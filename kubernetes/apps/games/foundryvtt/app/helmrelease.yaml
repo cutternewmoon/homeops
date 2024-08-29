@@ -50,7 +50,7 @@ spec:
               CONTAINER_CACHE: /data/container_cache
               CONTAINER_PATCHES: /data/container_patches
               CONTAINER_VERBOSE: 'true'
-              CONTAINER_PRESERVE_CONFIG: 'true'
+              # CONTAINER_PRESERVE_CONFIG: 'true' - Commenting this out to see if this is the issue....
               CONTAINER_PRESERVE_OWNER: '/data'
               FOUNDRY_TELEMETRY: false
               FOUNDRY_HOSTNAME: &host "foundry.${SECRET_DOMAIN}"
