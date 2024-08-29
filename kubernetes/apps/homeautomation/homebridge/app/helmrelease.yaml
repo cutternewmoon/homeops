@@ -70,7 +70,7 @@ spec:
     ingress:
       *app :
         enabled: true
-        ingressclassName: internal
+        className: internal
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
