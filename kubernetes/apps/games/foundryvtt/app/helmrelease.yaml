@@ -50,6 +50,7 @@ spec:
               CONTAINER_CACHE: /data/container_cache
               CONTAINER_PATCHES: /data/container_patches
               CONTAINER_VERBOSE: 'true'
+              CONTAINER_URL_FETCH_RETRY: "50"
               # CONTAINER_PRESERVE_CONFIG: 'true' - Commenting this out to see if this is the issue....
               CONTAINER_PRESERVE_OWNER: '/data'
               FOUNDRY_TELEMETRY: false
@@ -59,16 +60,17 @@ spec:
               FOUNDRY_PROTOCOL: '4'
               FOUNDRY_PROXY_PORT: '443'
               FOUNDRY_PROXY_SSL: 'true'
+              FOUNDRY_COMPRESS_WEBSOCKET: "true"
             envFrom:
               - secretRef:
                   name: foundryvtt-secret
 
     service:
-      app:
+      *app :
         controller: *app
-        type: LoadBalancer
-        annotations:
-          io.cilium/lb-ipam-ips: 192.168.1.140
+        # type: LoadBalancer
+        # annotations:
+        #   io.cilium/lb-ipam-ips: 192.168.1.140
         ports:
           http:
             port: &port 30000
