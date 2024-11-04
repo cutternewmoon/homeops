@@ -1,11 +1,12 @@
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./storage.yaml
 #  - ./bazarr/ks.yaml
-#  - ./prowlarr/ks.yaml
+  - ./prowlarr/ks.yaml
 #  - ./radarr/ks.yaml
 #  - ./readarr/ks.yaml
 #  - ./recyclarr/ks.yaml
