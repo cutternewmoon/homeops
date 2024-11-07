@@ -25,11 +25,11 @@ spec:
     keepHistory: false
   values:
     controllers:
-      main:
+      *app :
         annotations:
           secret.reloader.stakater.com/reload: &secret sabnzbd-secret
         containers:
-          main:
+          *app :
             image:
               repository: ghcr.io/onedr0p/sabnzbd
               tag: 4.3.3@sha256:86c645db93affcbf01cc2bce2560082bfde791009e1506dba68269b9c50bc341
