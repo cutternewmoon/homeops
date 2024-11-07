@@ -90,7 +90,7 @@ spec:
               limits:
                 memory: 500Mi
     service:
-      *app :
+      app:
         controller: *app
         ports:
           http:
