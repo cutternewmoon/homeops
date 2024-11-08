@@ -5,7 +5,7 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./storage.yaml
-#  - ./bazarr/ks.yaml
+  - ./bazarr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./radarr/ks.yaml
 #  - ./readarr/ks.yaml
