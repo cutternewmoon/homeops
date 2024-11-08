@@ -3,13 +3,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app bazarr
+  name: bazarr
   namespace: downloads
 spec:
   chart:
     spec:
       chart: app-template
-      version: 3.5.1
+      version: 3.1.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -17,8 +17,7 @@ spec:
   interval: 30m
   values:
     controllers:
-      *app :
-        type: statefulset
+      bazarr:
         annotations:
           secret.reloader.stakater.com/reload: &secret bazarr-secret
         initContainers:
@@ -30,14 +29,6 @@ spec:
             envFrom: &envFrom
               - secretRef:
                   name: bazarr-secret
-        statefulset:
-          volumeClaimTemplates:
-            - name: config
-              accessMode: ReadWriteOnce
-              size: 50Gi
-              storageClass: k8s-config
-              globalMounts:
-                - path: /config
         pod:
           securityContext:
             runAsNonRoot: true
@@ -48,102 +39,68 @@ spec:
             supplementalGroups:
               - 65536
         containers:
-          *app :
+          main:
             image:
-              repository: ghcr.io/onedr0p/bazarr-develop
-              tag: 1.4.5@sha256:c0bf91443c32f3978777b4ddd2732908f51b157bbe00cd3259b23f7716bb4af7
+              repository: ghcr.io/onedr0p/bazarr
+              tag: 1.4.2@sha256:7f152a7b8f46707f5feb68a315d8989cb85ed9e8b6868608f80e6f5eb6cc2e8e
             env:
-              TZ: America/Denver
+              TZ: "${CONFIG_TIMEZONE}"
             envFrom:
               - secretRef:
                   name: *secret
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /health
-                    port: &port 6767
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
-            securityContext: &securityContext
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
+                memory: 256M
               limits:
-                memory: 1Gi
+                memory: 1024M
           subcleaner:
             image:
               repository: registry.k8s.io/git-sync/git-sync
-              tag: v4.3.0@sha256:5813a7da0ccd58f6dfb9d5e48480e2877355e6bb3d7d81c8908eb1adc3a23b6e
-            env:
-              GITSYNC_REPO: https://github.com/KBlixt/subcleaner
-              GITSYNC_REF: master
-              GITSYNC_PERIOD: 24h
-              GITSYNC_ROOT: /add-ons
+              tag: v4.2.3
+            args:
+              - --repo=https://github.com/KBlixt/subcleaner
+              - --branch=master
+              - --wait=86400 # 1 day
+              - --root=/add-ons
             resources:
               requests:
                 cpu: 10m
+                memory: 10M
               limits:
-                memory: 128Mi
-            securityContext: *securityContext
+                memory: 128M
     service:
-      app:
-        controller: *app
+      main:
+        controller: bazarr
         ports:
           http:
-            port: *port
+            port: &port 6767
     persistence:
       config:
+        type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         size: 50Gi
         storageClass: k8s-config
-        retain: true
         globalMounts:
           - path: /config
       media:
+        type: persistentVolumeClaim
         existingClaim: glabdownloadsclaim
         globalMounts:
           - path: /media
-      add-ons:
-        type: emptyDir
-      cache:
-        type: emptyDir
-        globalMounts:
-          - path: /config/cache
-      log:
-        type: emptyDir
-        globalMounts:
-          - path: /config/log
-      scripts:
-        type: configMap
-        name: bazarr-scripts
-        namespace: downloads
-        defaultMode: 0775
-        globalMounts:
-          - readOnly: true
       tmp:
         type: emptyDir
+      add-ons:
+        type: emptyDir
     ingress:
-      *app :
+      main:
         enabled: true
         className: internal
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
         hosts:
-          - host: &host "bazarr.${SECRET_DOMAIN}"
+          - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
-                  name: *app
+                  identifier: main
                   port: *port
-        tls:
-          - hosts:
-            - *host
+        tls: [hosts: [*host]]
