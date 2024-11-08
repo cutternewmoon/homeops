@@ -125,6 +125,7 @@ spec:
       scripts:
         type: configMap
         name: bazarr-scripts
+        namespace: downloads
         defaultMode: 0775
         globalMounts:
           - readOnly: true
