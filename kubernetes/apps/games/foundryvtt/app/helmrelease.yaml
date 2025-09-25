@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.0
+      version: 3.7.3
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -43,7 +43,7 @@ spec:
           *app :
             image:
               repository: ghcr.io/felddy/foundryvtt
-              tag: 13.335.0
+              tag: 13.348.0
 
             env:
               TIMEZONE: '${TIMEZONE}'
